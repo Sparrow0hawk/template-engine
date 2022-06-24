@@ -25,7 +25,22 @@ impl fmt::Display for Data {
 
 // an outline of our expected render function
 /// render function that renders template using HashMap data
-fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {}
+fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
+    // for the template engine we want to match items contained within
+    // double curly braces `{{ item }}` in the template and replace it with
+    // our data
+    // we unwrap here to get the value from the Result
+    let print_regex = Regex::new(r"\{\{(.*?)\}\}").unwrap();
+
+    template = print_regex
+        .replace_all(&template, |caps: &Captures| {
+            let key = caps.get(1).unwrap().as_str().trim();
+            data[key].to_string()
+        })
+        .to_string();
+
+    template
+}
 
 #[cfg(test)]
 mod tests {
