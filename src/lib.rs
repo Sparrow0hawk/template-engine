@@ -44,9 +44,29 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
 
 #[cfg(test)]
 mod tests {
+    use crate::{render, Data};
+    use assert_str::assert_str_trim_eq;
+    use std::collections::HashMap;
+
     #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+    fn test_template() {
+        let test_data = HashMap::from([("hello", Data::Text("Hello world!".to_string()))]);
+        let input = std::fs::read_to_string("dist/hello.html").expect(
+            "
+        Something went wrong reading this file!",
+        );
+
+        let result = "<!DOCTYPE html>
+        <html>
+        
+        <body>
+            <h1>Hello world!</h1>
+        </body>
+        
+        </html>
+        "
+        .to_string();
+
+        assert_str_trim_eq!(render(input, test_data), result);
     }
 }
