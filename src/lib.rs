@@ -39,6 +39,19 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
         })
         .to_string();
 
+    let repeat_regex =
+        Regex::new(r"\{% repeat (\d*?) times %\}((.|\n)*?)\{% endrepeat %\}").unwrap();
+
+    template = repeat_regex
+        .replace_all(&template, |caps: &Captures| {
+            let times = caps.get(1).unwrap().as_str().trim();
+
+            let code = caps.get(2).unwrap().as_str().trim();
+
+            code.repeat(times.parse::<usize>().unwrap())
+        })
+        .to_string();
+
     template
 }
 
@@ -68,5 +81,13 @@ mod tests {
         .to_string();
 
         assert_str_trim_eq!(render(input, test_data), result);
+    }
+
+    #[test]
+    fn test_repeat() {
+        let input = "{% repeat 4 times %}hello{% endrepeat %}".to_string();
+        let data = HashMap::from([("hello", Data::Text("Hello world!".to_string()))]);
+
+        assert_eq!(render(input, data), "hellohellohellohello".to_string())
     }
 }
