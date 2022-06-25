@@ -44,10 +44,16 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
 
     template = repeat_regex
         .replace_all(&template, |caps: &Captures| {
+            // extract the number of times to repeat the `code`
+            // the assumption here is that this value can
+            // be coerced to a integer
             let times = caps.get(1).unwrap().as_str().trim();
 
+            // the `code` within the repeat section
             let code = caps.get(2).unwrap().as_str().trim();
 
+            // coerce times to usize type and repeat
+            // `code` string `times` times
             code.repeat(times.parse::<usize>().unwrap())
         })
         .to_string();
