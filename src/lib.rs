@@ -32,15 +32,15 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
     // we unwrap here to get the value from the Result
     let print_regex = Regex::new(r"\{\{(.*?)\}\}").unwrap();
 
+    let repeat_regex =
+        Regex::new(r"\{% repeat (\d*?) times %\}((.|\n)*?)\{% endrepeat %\}").unwrap();
+
     template = print_regex
         .replace_all(&template, |caps: &Captures| {
             let key = caps.get(1).unwrap().as_str().trim();
             data[key].to_string()
         })
         .to_string();
-
-    let repeat_regex =
-        Regex::new(r"\{% repeat (\d*?) times %\}((.|\n)*?)\{% endrepeat %\}").unwrap();
 
     template = repeat_regex
         .replace_all(&template, |caps: &Captures| {
