@@ -5,7 +5,7 @@ use std::{collections::HashMap, fmt};
 // essentially specifying what types the `value` section of
 // the HashMap `key`:`value` can have
 // we specify rust types that these custom types map too
-enum Data {
+pub enum Data {
     Number(i32),
     Boolean(bool),
     Text(String),
@@ -25,7 +25,7 @@ impl fmt::Display for Data {
 
 // an outline of our expected render function
 /// render function that renders template using HashMap data
-fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
+pub fn render(mut template: String, data: HashMap<&str, Data>) -> String {
     // for the template engine we want to match items contained within
     // double curly braces `{{ item }}` in the template and replace it with
     // our data
