@@ -71,8 +71,8 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
 
             let else_code = caps.get(5).map_or("", |m| m.as_str()).trim();
 
-            if let Data::Boolean(exp) = data[key] {
-                if exp {
+            if let Some(Data::Boolean(exp)) = data.get(key) {
+                if *exp {
                     if_code.to_string()
                 } else {
                     else_code.to_string()
