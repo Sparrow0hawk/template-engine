@@ -143,4 +143,15 @@ mod tests {
 
         assert_eq!(render(input_else, data), "Unicorn".to_string());
     }
+
+    #[test]
+    fn test_nokey() {
+        let input_nokey = "{% if badkey %}amazing{% endif %}".to_string();
+        let data = HashMap::from([
+            ("test", Data::Boolean(true)),
+            ("false_test", Data::Boolean(false)),
+        ]);
+
+        assert_eq!(render(input_nokey, data), "ERROR PARSING KEY".to_string())
+    }
 }
