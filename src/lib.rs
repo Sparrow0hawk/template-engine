@@ -35,6 +35,11 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
     let repeat_regex =
         Regex::new(r"\{% repeat (\d*?) times %\}((.|\n)*?)\{% endrepeat %\}").unwrap();
 
+    let if_else_reg = Regex::new(
+        r"\{% if (.*?) %\}((.|\n)*?)(\{% else %\}((.|\n)*?)\{% endif %\}|\{% endif %\})",
+    )
+    .unwrap();
+
     template = print_regex
         .replace_all(&template, |caps: &Captures| {
             let key = caps.get(1).unwrap().as_str().trim();
@@ -55,6 +60,26 @@ fn render(mut template: String, mut data: HashMap<&str, Data>) -> String {
             // coerce times to usize type and repeat
             // `code` string `times` times
             code.repeat(times.parse::<usize>().unwrap())
+        })
+        .to_string();
+
+    template = if_else_reg
+        .replace_all(&template, |caps: &Captures| {
+            let key = caps.get(1).unwrap().as_str().trim();
+
+            let if_code = caps.get(2).unwrap().as_str().trim();
+
+            let else_code = caps.get(5).map_or("", |m| m.as_str()).trim();
+
+            if let Data::Boolean(exp) = data[key] {
+                if exp {
+                    if_code.to_string()
+                } else {
+                    else_code.to_string()
+                }
+            } else {
+                "ERROR PARSING KEY".to_string()
+            }
         })
         .to_string();
 
@@ -95,5 +120,27 @@ mod tests {
         let data = HashMap::from([("hello", Data::Text("Hello world!".to_string()))]);
 
         assert_eq!(render(input, data), "hellohellohellohello".to_string())
+    }
+
+    #[test]
+    fn test_if() {
+        let input_if = "{% if test %}hello world!{% endif %}".to_string();
+        let data = HashMap::from([
+            ("test", Data::Boolean(true)),
+            ("false_test", Data::Boolean(false)),
+        ]);
+
+        assert_eq!(render(input_if, data), "hello world!".to_string());
+    }
+
+    #[test]
+    fn test_else() {
+        let input_else = "{% if false_test %}Magic{% else %}Unicorn{% endif %}".to_string();
+        let data = HashMap::from([
+            ("test", Data::Boolean(true)),
+            ("false_test", Data::Boolean(false)),
+        ]);
+
+        assert_eq!(render(input_else, data), "Unicorn".to_string());
     }
 }
